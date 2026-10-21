@@ -1,0 +1,6 @@
+{
+  "name": "Fem’s Glamour",
+  "description": "Luxury salon website for Fem’s Glamour located in Mumbai, Maharashtra. Features beauty services, portfolio gallery, Google reviews proof, and appointment booking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
