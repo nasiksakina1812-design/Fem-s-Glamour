@@ -1,149 +1,147 @@
-import React from 'react';
-import { ArrowUpRight, Check, HelpCircle, PhoneCall } from 'lucide-react';
-import { SALON_CONFIG, ServiceCategoryItem } from '../config/salonConfig';
-import { VisualMedia } from './VisualMedia';
+import React, { useState } from 'react';
+import { ArrowUpRight, Check, HelpCircle, Clock, Tag } from 'lucide-react';
+import { SALON_CONFIG } from '../config/salonConfig';
 
 interface ServicesProps {
   onSelectService: (serviceName: string) => void;
 }
 
 export const Services: React.FC<ServicesProps> = ({ onSelectService }) => {
+  const [activeCategory, setActiveCategory] = useState<string>('hair');
+
+  const filteredServices = SALON_CONFIG.services.filter(
+    (item) => item.category === activeCategory
+  );
+
   return (
-    <section id="services" className="py-20 lg:py-28 bg-[#FBF0F0] border-t border-[#EFCACA]">
+    <section id="services" className="py-20 lg:py-28 bg-[#FFFFFF] border-b border-[#FBCFE8]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="max-w-2xl mx-auto text-center mb-14">
-          <div className="text-xs uppercase tracking-[0.25em] text-[#873E4F] font-semibold mb-3">
-            Bespoke Offerings
+        <div className="max-w-3xl mx-auto text-center mb-12">
+          <div className="text-xs uppercase tracking-[0.25em] text-[#D6336C] font-semibold mb-3">
+            Atelier Menu & Rituals
           </div>
-          <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl text-[#5A2331] font-semibold tracking-tight text-balance">
-            Curated <span className="italic font-normal text-[#873E4F]">Beauty Rituals</span>
+          <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl text-[#2A111E] font-semibold tracking-tight text-balance">
+            Services & <span className="italic font-normal text-[#E05780]">Treatments</span>
           </h2>
-          <p className="mt-4 text-sm sm:text-base text-[#5A2331]/75 leading-relaxed font-normal">
-            Explore our proposed offerings across hair, skin, bridal, and makeup disciplines. Every treatment is customized to your personal features and lifestyle during your consultation.
+          <p className="mt-4 text-sm sm:text-base text-[#704856] leading-relaxed font-normal">
+            Choose from our proposed atelier categories. Each discipline is customized during your consultation according to your hair profile, skin sensitivity, and desired finish.
           </p>
 
-          {/* Transparent disclaimer on proposed status */}
-          <div className="mt-5 inline-flex items-center gap-1.5 text-xs text-[#5A2331]/75 bg-[#FFFFFF] py-1.5 px-4 rounded-full border border-[#EFCACA] shadow-sm">
-            <HelpCircle className="w-3.5 h-3.5 text-[#873E4F]" />
-            <span>Proposed service disciplines · Custom consultations & pricing upon enquiry</span>
+          {/* Honest Proposed Category Disclosure */}
+          <div className="mt-5 inline-flex items-center gap-1.5 text-xs text-[#704856] bg-[#FFF0F5] py-1.5 px-4 rounded-full border border-[#FBCFE8] shadow-sm">
+            <HelpCircle className="w-3.5 h-3.5 text-[#E05780]" />
+            <span>Proposed menu categories · Final pricing and timeline tailored upon personal consultation</span>
           </div>
         </div>
 
-        {/* Six Image-Led Service Cards Grid in Crisp White & Blush Pink */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {SALON_CONFIG.services.map((service, index) => (
-            <ServiceCard
+        {/* Category Tabs */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-14">
+          {SALON_CONFIG.serviceCategories.map((cat) => {
+            const isActive = activeCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-[0.16em] transition-all cursor-pointer ${
+                  isActive
+                    ? 'bg-gradient-to-r from-[#E05780] to-[#D6336C] text-[#FFFFFF] shadow-md scale-105 border border-[#FBCFE8]/50'
+                    : 'bg-[#FFF0F5] text-[#704856] hover:text-[#2A111E] border border-[#FBCFE8] hover:border-[#E05780]/40 shadow-sm'
+                }`}
+              >
+                {cat.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Service Cards Grid for Active Category */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {filteredServices.map((service) => (
+            <div
               key={service.id}
-              service={service}
-              index={index}
-              onEnquire={() => onSelectService(service.name)}
-            />
+              className="group bg-[#FFFFFF] rounded-3xl border border-[#FBCFE8] overflow-hidden flex flex-col justify-between transition-all duration-300 hover:border-[#E05780]/60 hover:shadow-2xl hover:-translate-y-1"
+            >
+              <div>
+                {/* Visual Header */}
+                <div className="relative aspect-[16/9] overflow-hidden bg-[#1F0B16]">
+                  <img
+                    src={service.imageUrl}
+                    alt={service.imageAlt}
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-90"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#1F0B16]/80 via-transparent to-transparent" />
+                  
+                  {/* Category Pill Tag */}
+                  <div className="absolute top-4 left-4 z-10 px-3.5 py-1 rounded-full bg-[#FFFFFF]/95 backdrop-blur-md text-[10px] uppercase tracking-[0.2em] font-semibold text-[#2A111E] border border-[#FBCFE8] shadow-sm">
+                    Proposed Service
+                  </div>
+
+                  {/* Price & Duration Overlays */}
+                  <div className="absolute bottom-4 left-4 right-4 z-10 flex items-center justify-between text-xs text-white">
+                    {service.duration && (
+                      <span className="flex items-center gap-1 text-[11px] text-[#F9A8D4]">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>{service.duration}</span>
+                      </span>
+                    )}
+                    {service.price && (
+                      <span className="flex items-center gap-1 font-serif text-sm font-semibold text-[#FFFFFF]">
+                        <Tag className="w-3.5 h-3.5 text-[#F9A8D4]" />
+                        <span>{service.price}</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Body Content */}
+                <div className="p-7">
+                  <h3 className="font-serif text-2xl font-semibold text-[#2A111E] group-hover:text-[#E05780] transition-colors leading-snug">
+                    {service.name}
+                  </h3>
+
+                  <p className="mt-3 text-xs sm:text-sm text-[#704856] leading-relaxed font-normal">
+                    {service.shortDesc}
+                  </p>
+
+                  {/* Highlights Bullet List */}
+                  <div className="mt-5 space-y-2">
+                    {service.highlights.map((highlight, idx) => (
+                      <div key={idx} className="flex items-start gap-2.5 text-xs text-[#2A111E]/90 font-normal">
+                        <span className="mt-0.5 w-3.5 h-3.5 rounded-full bg-[#FFF0F5] text-[#E05780] flex items-center justify-center shrink-0">
+                          <Check className="w-2.5 h-2.5" />
+                        </span>
+                        <span>{highlight}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Card Footer with Working CTA */}
+              <div className="px-7 pb-7 pt-0">
+                <div className="pt-4 border-t border-[#FBCFE8] flex items-center justify-between gap-4">
+                  <span className="text-[11px] text-[#704856]/70 italic">
+                    Consultation advised
+                  </span>
+
+                  <button
+                    onClick={() => onSelectService(service.name)}
+                    className="group/btn px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-[0.16em] text-[#FFFFFF] bg-gradient-to-r from-[#E05780] to-[#D6336C] hover:from-[#D6336C] hover:to-[#BE185D] border border-[#FBCFE8]/30 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+                  >
+                    <span>Select Service</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-[#FFFFFF] transition-transform duration-300 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+                  </button>
+                </div>
+              </div>
+
+            </div>
           ))}
-        </div>
-
-        {/* Bottom Consultation Banner */}
-        <div className="mt-16 p-8 rounded-3xl bg-gradient-to-r from-[#FFFFFF] via-[#F6E2E2] to-[#FBF0F0] text-[#5A2331] border border-[#EFCACA] flex flex-col sm:flex-row items-center justify-between gap-6 shadow-md">
-          <div className="space-y-1.5 text-center sm:text-left">
-            <span className="text-[10px] uppercase tracking-[0.25em] text-[#873E4F] font-semibold">
-              Bespoke Beauty Planning
-            </span>
-            <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-[#5A2331]">
-              Planning a wedding or private occasion?
-            </h3>
-            <p className="text-xs sm:text-sm text-[#5A2331]/80 max-w-xl">
-              Discuss bridal parties, celebration styling groups, or bespoke multi-service rituals directly with our lead stylists.
-            </p>
-          </div>
-
-          <a
-            href={SALON_CONFIG.phoneTel}
-            className="group px-7 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-white bg-[#873E4F] hover:bg-[#5A2331] rounded-full transition-all shrink-0 active:scale-95 text-center shadow-md flex items-center gap-2"
-          >
-            <PhoneCall className="w-3.5 h-3.5 text-[#F6E2E2]" />
-            <span>Call {SALON_CONFIG.phone}</span>
-          </a>
         </div>
 
       </div>
     </section>
-  );
-};
-
-interface ServiceCardProps {
-  service: ServiceCategoryItem;
-  index: number;
-  onEnquire: () => void;
-}
-
-const ServiceCard: React.FC<ServiceCardProps> = ({ service, index, onEnquire }) => {
-  const displayIndex = String(index + 1).padStart(2, '0');
-
-  return (
-    <div className="group bg-[#FFFFFF] rounded-3xl border border-[#EFCACA] overflow-hidden flex flex-col justify-between transition-all duration-300 hover:border-[#D48E92] hover:shadow-xl hover:-translate-y-1.5">
-      
-      <div>
-        {/* Image Carrier with Elegant Caption & Zoom */}
-        <div className="relative w-full aspect-[16/11] overflow-hidden bg-[#FBF0F0]">
-          <VisualMedia
-            type={service.fallbackType as any}
-            imageUrl={service.imageUrl}
-            alt={service.imageAlt}
-            title={service.name}
-            category={service.proposedStatus}
-            className="w-full h-full rounded-none"
-          />
-
-          {/* Number Tag in Top Corner */}
-          <div className="absolute top-3 left-3 z-20 px-3 py-1 rounded-full bg-[#FFFFFF]/95 backdrop-blur-md text-[11px] font-serif font-bold text-[#873E4F] border border-[#EFCACA] shadow-sm tabular-nums">
-            {displayIndex}
-          </div>
-        </div>
-
-        {/* Content Body */}
-        <div className="p-6 sm:p-7">
-          <div className="text-[10px] uppercase tracking-[0.2em] text-[#873E4F] font-semibold mb-2">
-            {service.proposedStatus}
-          </div>
-
-          <h3 className="font-serif text-2xl font-semibold text-[#5A2331] group-hover:text-[#873E4F] transition-colors leading-snug">
-            {service.name}
-          </h3>
-
-          <p className="mt-3 text-xs sm:text-sm text-[#5A2331]/75 leading-relaxed font-normal">
-            {service.shortDesc}
-          </p>
-
-          {/* Highlights List */}
-          <div className="mt-5 space-y-2">
-            {service.highlights.map((highlight, idx) => (
-              <div key={idx} className="flex items-start gap-2.5 text-xs text-[#5A2331]/80">
-                <span className="mt-0.5 w-3.5 h-3.5 rounded-full bg-[#F6E2E2] text-[#873E4F] flex items-center justify-center shrink-0">
-                  <Check className="w-2.5 h-2.5" />
-                </span>
-                <span>{highlight}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Card Footer with Consultation Note & Enquiry CTA */}
-      <div className="px-6 pb-6 sm:px-7 sm:pb-7 pt-0">
-        <div className="text-[11px] text-[#873E4F] mb-4 italic border-t border-[#FBF0F0] pt-3">
-          {service.consultationNote}
-        </div>
-
-        <button
-          onClick={onEnquire}
-          className="group/btn w-full py-3 px-4 rounded-full text-xs font-semibold uppercase tracking-[0.16em] text-[#5A2331] bg-[#FBF0F0] group-hover:bg-[#873E4F] group-hover:text-white border border-[#EFCACA] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-95"
-        >
-          <span>Enquire About Service</span>
-          <ArrowUpRight className="w-4 h-4 text-[#873E4F] group-hover:text-white transition-transform duration-300 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1" />
-        </button>
-      </div>
-
-    </div>
   );
 };

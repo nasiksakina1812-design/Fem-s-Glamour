@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, User, Phone, Sparkles, MessageSquare, Send, CheckCircle2, AlertCircle, PhoneCall, MapPin, Star } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useScroll, useTransform } from 'motion/react';
+import { Calendar, Clock, User, Phone, Sparkles, Send, CheckCircle2, AlertCircle, PhoneCall, MapPin, Star } from 'lucide-react';
 import { SALON_CONFIG, createWhatsAppBookingUrl } from '../config/salonConfig';
 
 interface BookingEnquiryProps {
@@ -13,7 +14,7 @@ export const BookingEnquiry: React.FC<BookingEnquiryProps> = ({
 }) => {
   const [fullName, setFullName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [selectedService, setSelectedService] = useState(preselectedService || 'Hair Styling & Designer Cuts');
+  const [selectedService, setSelectedService] = useState(preselectedService || 'Bespoke Precision Haircut & Texture');
   const [preferredDate, setPreferredDate] = useState('');
   const [preferredTime, setPreferredTime] = useState('Morning (10:00 AM – 01:00 PM)');
   const [notes, setNotes] = useState('');
@@ -104,7 +105,7 @@ export const BookingEnquiry: React.FC<BookingEnquiryProps> = ({
       service: selectedService,
       date: preferredDate,
       time: preferredTime,
-      notes,
+      notes: notes.trim() || undefined,
     });
   };
 
@@ -116,77 +117,110 @@ export const BookingEnquiry: React.FC<BookingEnquiryProps> = ({
     if (onClearPreselectedService) onClearPreselectedService();
   };
 
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start']
+  });
+  const bgY = useTransform(scrollYProgress, [0, 1], ['-16%', '16%']);
+
   return (
-    <section id="booking" className="py-24 lg:py-32 bg-[#FBF0F0] text-[#5A2331] relative overflow-hidden border-t border-[#EFCACA]">
-      {/* Decorative luxury architectural line work in soft blush */}
-      <div className="absolute inset-0 opacity-25 pointer-events-none">
+    <section
+      ref={sectionRef}
+      id="booking"
+      className="py-24 lg:py-32 text-[#2A111E] relative overflow-hidden border-t border-[#FBCFE8]"
+    >
+      {/* 1. Scrolling Parallax Background Image */}
+      <motion.div
+        style={{ y: bgY }}
+        className="absolute inset-0 -top-[25%] -bottom-[25%] w-full h-[150%] z-0 pointer-events-none parallax-bg"
+      >
+        <img
+          src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=2000&q=80"
+          alt="Fem’s Glamour salon atmosphere background"
+          className="w-full h-full object-cover object-center opacity-20"
+        />
+      </motion.div>
+
+      {/* 2. Soft Pink & White Translucent Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#FFF5F8]/95 via-[#FFFFFF]/92 to-[#FFF5F8]/95 backdrop-blur-[2px] z-1" />
+
+      {/* Ambient Pink Glows */}
+      <div className="absolute top-1/4 -right-32 w-96 h-96 rounded-full bg-[#FCE7F3]/70 blur-3xl pointer-events-none z-1" />
+      <div className="absolute bottom-1/4 -left-32 w-96 h-96 rounded-full bg-[#FDF2F8]/60 blur-3xl pointer-events-none z-1" />
+
+      {/* Decorative luxury architectural line work in Pink */}
+      <div className="absolute inset-0 opacity-15 pointer-events-none z-1">
         <svg className="w-full h-full" viewBox="0 0 1000 800" fill="none">
-          <circle cx="200" cy="400" r="300" stroke="#D48E92" strokeWidth="1" strokeDasharray="4 4" />
-          <circle cx="800" cy="400" r="300" stroke="#EFCACA" strokeWidth="1" strokeDasharray="4 4" />
-          <path d="M0 400 L1000 400" stroke="#EFCACA" strokeWidth="0.5" />
+          <circle cx="200" cy="400" r="300" stroke="#E05780" strokeWidth="1" strokeDasharray="4 4" />
+          <circle cx="800" cy="400" r="300" stroke="#E05780" strokeWidth="1" strokeDasharray="4 4" />
+          <path d="M0 400 L1000 400" stroke="#E05780" strokeWidth="0.5" />
         </svg>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Section Header */}
-        <div className="max-w-2xl mx-auto text-center mb-14">
-          <div className="text-xs uppercase tracking-[0.25em] text-[#873E4F] font-semibold mb-3">
-            Plan Your Appointment
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.7 }}
+          className="max-w-2xl mx-auto text-center mb-14"
+        >
+          <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-[0.25em] text-[#D6336C] font-semibold mb-3">
+            <Sparkles className="w-3.5 h-3.5 text-[#E05780]" />
+            <span>Private Atelier Reservation</span>
           </div>
-          <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl text-[#5A2331] font-semibold tracking-tight text-balance">
-            Appointment <span className="italic font-normal text-[#873E4F]">Enquiry</span>
+          <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl text-[#2A111E] font-semibold tracking-tight text-balance">
+            Book Your <span className="italic font-normal text-[#E05780]">Visit</span>
           </h2>
-          <p className="mt-4 text-sm sm:text-base text-[#5A2331]/80 leading-relaxed font-normal">
+          <p className="mt-4 text-sm sm:text-base text-[#704856] leading-relaxed font-normal">
             Reserve your consultation at Princess Building. Our salon concierge will reach out promptly to confirm your scheduled slot.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Split Screen Layout in Blush Pink & White */}
+        {/* Striking Split Screen Layout: Atmospheric Left Card + Pure White Form Panel Right */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
           
-          {/* Left Column: Concierge Visual Card */}
+          {/* Left Column: Visual Atmosphere Card */}
           <div className="lg:col-span-5 flex flex-col justify-between">
-            <div className="relative h-full min-h-[400px] rounded-3xl overflow-hidden border border-[#EFCACA] shadow-xl flex flex-col justify-between p-8 bg-gradient-to-b from-[#FFFFFF] via-[#FBF0F0] to-[#F6E2E2]">
+            <div className="relative h-full min-h-[420px] rounded-3xl overflow-hidden border border-[#FBCFE8] shadow-xl flex flex-col justify-between p-8 bg-[#1F0B16]">
               
               {/* Background Photo with Scrim */}
               <div className="absolute inset-0 z-0">
                 <img
                   src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=80"
                   alt="Fem’s Glamour luxury beauty salon concierge"
-                  className="w-full h-full object-cover opacity-20"
+                  className="w-full h-full object-cover opacity-35"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#FFFFFF] via-[#FBF0F0]/80 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#14050D] via-[#1F0B16]/80 to-[#1F0B16]/30" />
               </div>
 
               {/* Top Details */}
               <div className="relative z-10">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#873E4F] font-semibold">
-                  <span className="w-2 h-2 rounded-full bg-[#D48E92]" />
+                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#F9A8D4] font-semibold">
+                  <span className="w-2 h-2 rounded-full bg-[#E05780]" />
                   <span>The Concierge Desk</span>
                 </div>
-                <h3 className="font-serif text-3xl font-semibold text-[#5A2331] mt-2 leading-tight">
+                <h3 className="font-serif text-3xl font-semibold text-white mt-2 leading-tight">
                   Your Signature Experience Awaits
                 </h3>
               </div>
 
               {/* Bottom Quote & Trust Markers */}
               <div className="relative z-10 space-y-4 pt-12">
-                <blockquote className="font-serif italic text-base sm:text-lg text-[#5A2331]/90 border-l-2 border-[#873E4F] pl-4">
+                <blockquote className="font-serif italic text-base sm:text-lg text-[#FFF0F5] border-l-2 border-[#E05780] pl-4">
                   “A sanctuary where every detail is tailored to celebrate your personal radiance and peace of mind.”
                 </blockquote>
 
-                <div className="pt-4 border-t border-[#EFCACA] space-y-2 text-xs text-[#5A2331]/85">
+                <div className="pt-4 border-t border-[#FBCFE8]/30 space-y-2 text-xs text-[#F9A8D4]">
                   <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-[#873E4F] shrink-0" />
+                    <MapPin className="w-4 h-4 text-[#E05780] shrink-0" />
                     <span>Princess Building, C-Block, JJ Flyover, South Mumbai</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-[#873E4F] shrink-0" />
-                    <span>Direct Telephone: {SALON_CONFIG.phoneDisplay}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-[#D48E92] fill-[#D48E92] shrink-0" />
+                    <Star className="w-4 h-4 text-[#E05780] fill-[#E05780] shrink-0" />
                     <span>Rated 4.7 / 5 by 2,128+ verified Google clients</span>
                   </div>
                 </div>
@@ -195,60 +229,46 @@ export const BookingEnquiry: React.FC<BookingEnquiryProps> = ({
             </div>
           </div>
 
-          {/* Right Column: Sophisticated Pure White Form Panel */}
+          {/* Right Column: Sophisticated White Form Panel */}
           <div className="lg:col-span-7">
             {submittedInquiry ? (
-              /* Confirmation Screen in Pure White */
-              <div className="bg-[#FFFFFF] rounded-3xl p-8 sm:p-12 text-[#5A2331] border border-[#EFCACA] shadow-xl h-full flex flex-col justify-between">
+              /* Confirmation Screen in White Panel */
+              <div className="bg-[#FFFFFF] rounded-3xl p-8 sm:p-12 text-[#2A111E] border border-[#FBCFE8] shadow-xl h-full flex flex-col justify-between">
                 <div>
-                  <div className="w-16 h-16 rounded-full bg-[#FBF0F0] text-[#873E4F] flex items-center justify-center mx-auto mb-6 shadow-sm border border-[#EFCACA]">
+                  <div className="w-16 h-16 rounded-full bg-[#FFF0F5] text-[#E05780] flex items-center justify-center mx-auto mb-6 shadow-sm border border-[#FBCFE8]">
                     <CheckCircle2 className="w-8 h-8" />
                   </div>
 
                   <div className="text-center">
-                    <span className="text-xs uppercase tracking-[0.2em] text-[#873E4F] font-semibold">
+                    <span className="text-xs uppercase tracking-[0.2em] text-[#D6336C] font-semibold">
                       Enquiry Prepared
                     </span>
-                    <h3 className="font-serif text-3xl font-semibold text-[#5A2331] mt-1">
-                      Thank You, {submittedInquiry.fullName}
+                    <h3 className="font-serif text-3xl font-semibold text-[#2A111E] mt-1">
+                      Request Registered
                     </h3>
-                    <p className="text-xs text-[#5A2331]/60 mt-1">
-                      Reference Code: <strong className="font-mono text-[#873E4F] font-bold">{submittedInquiry.referenceId}</strong>
+                    <p className="text-sm text-[#704856] mt-2 max-w-md mx-auto">
+                      Thank you, <span className="font-semibold text-[#2A111E]">{submittedInquiry.fullName}</span>. Your enquiry for <strong className="text-[#D6336C]">{submittedInquiry.service}</strong> is saved under reference <span className="font-mono font-semibold text-[#E05780]">{submittedInquiry.referenceId}</span>.
                     </p>
                   </div>
 
-                  {/* Clarification Notice */}
-                  <div className="mt-6 p-4 rounded-2xl bg-[#FBF0F0] border border-[#EFCACA] flex items-start gap-3 text-xs text-[#5A2331]/80">
-                    <AlertCircle className="w-5 h-5 text-[#873E4F] shrink-0 mt-0.5" />
-                    <p className="leading-relaxed">
-                      <strong>Important Notice:</strong> This appointment request is <span className="underline decoration-[#D48E92] font-semibold">not a confirmed booking</span> until our salon team verifies availability with you via phone or WhatsApp.
-                    </p>
+                  {/* Verification Notice */}
+                  <div className="mt-6 p-4 rounded-2xl bg-[#FFF0F5] border border-[#FBCFE8] flex items-start gap-3 text-xs text-[#704856]">
+                    <AlertCircle className="w-4 h-4 text-[#E05780] shrink-0 mt-0.5" />
+                    <div>
+                      <strong>Important Notice:</strong> This appointment request is <span className="underline decoration-[#E05780] font-semibold text-[#2A111E]">not a confirmed booking</span> until our salon team verifies availability with you via phone or WhatsApp.
+                    </div>
                   </div>
 
-                  {/* Summary Card */}
-                  <div className="mt-6 p-6 rounded-2xl bg-[#FDF8F8] border border-[#EFCACA] space-y-2.5 text-xs sm:text-sm">
-                    <div className="flex justify-between py-1 border-b border-[#EFCACA]/50">
-                      <span className="text-[#5A2331]/60">Requested Service:</span>
-                      <span className="font-semibold text-[#5A2331]">{submittedInquiry.service}</span>
+                  {/* Summary Details Grid */}
+                  <div className="mt-6 grid grid-cols-2 gap-4 text-xs p-4 rounded-2xl bg-[#FFF8FA] border border-[#FBCFE8]">
+                    <div>
+                      <span className="text-[#704856]/70 block">Client Contact</span>
+                      <span className="font-medium text-[#2A111E]">{submittedInquiry.phoneNumber}</span>
                     </div>
-                    <div className="flex justify-between py-1 border-b border-[#EFCACA]/50">
-                      <span className="text-[#5A2331]/60">Preferred Date:</span>
-                      <span className="font-medium text-[#5A2331]">{submittedInquiry.date}</span>
+                    <div>
+                      <span className="text-[#704856]/70 block">Target Date & Slot</span>
+                      <span className="font-medium text-[#2A111E]">{submittedInquiry.date} · {submittedInquiry.time.split(' ')[0]}</span>
                     </div>
-                    <div className="flex justify-between py-1 border-b border-[#EFCACA]/50">
-                      <span className="text-[#5A2331]/60">Time Slot:</span>
-                      <span className="font-medium text-[#5A2331]">{submittedInquiry.time}</span>
-                    </div>
-                    <div className="flex justify-between py-1">
-                      <span className="text-[#5A2331]/60">Contact Phone:</span>
-                      <span className="font-medium text-[#5A2331]">{submittedInquiry.phoneNumber}</span>
-                    </div>
-                    {submittedInquiry.notes && (
-                      <div className="pt-2 text-xs text-[#5A2331]/70 border-t border-[#EFCACA]/50">
-                        <span className="text-[#5A2331]/50 block mb-0.5">Note:</span>
-                        <span>{submittedInquiry.notes}</span>
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -265,25 +285,25 @@ export const BookingEnquiry: React.FC<BookingEnquiryProps> = ({
                       })}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full sm:flex-1 py-3.5 px-5 rounded-full text-xs font-semibold uppercase tracking-wider text-white bg-[#873E4F] hover:bg-[#5A2331] border border-[#EFCACA] flex items-center justify-center gap-2 shadow-md transition-all text-center"
+                      className="w-full sm:flex-1 py-3.5 px-5 rounded-full text-xs font-semibold uppercase tracking-wider text-[#FFFFFF] bg-gradient-to-r from-[#E05780] to-[#D6336C] hover:from-[#D6336C] hover:to-[#BE185D] border border-[#FBCFE8]/40 flex items-center justify-center gap-2 shadow-md transition-all text-center"
                     >
-                      <Send className="w-3.5 h-3.5 text-[#F6E2E2]" />
+                      <Send className="w-3.5 h-3.5 text-[#FFFFFF]" />
                       <span>Send via WhatsApp Now</span>
                     </a>
 
                     <a
                       href={SALON_CONFIG.phoneTel}
-                      className="w-full sm:flex-1 py-3.5 px-5 rounded-full text-xs font-semibold uppercase tracking-wider text-[#5A2331] bg-[#FBF0F0] hover:bg-[#F6E2E2] border border-[#EFCACA] flex items-center justify-center gap-2 transition-all text-center"
+                      className="w-full sm:flex-1 py-3.5 px-5 rounded-full text-xs font-semibold uppercase tracking-wider text-[#2A111E] bg-[#FFF0F5] hover:bg-[#FFFFFF] border border-[#FBCFE8] flex items-center justify-center gap-2 transition-all text-center"
                     >
-                      <PhoneCall className="w-3.5 h-3.5 text-[#873E4F]" />
-                      <span>Call {SALON_CONFIG.phone}</span>
+                      <PhoneCall className="w-3.5 h-3.5 text-[#E05780]" />
+                      <span>Call Atelier Directly</span>
                     </a>
                   </div>
 
                   <div className="text-center pt-2">
                     <button
                       onClick={handleResetForm}
-                      className="text-xs text-[#873E4F] hover:text-[#5A2331] underline cursor-pointer"
+                      className="text-xs text-[#D6336C] hover:underline cursor-pointer font-medium"
                     >
                       Submit Another Enquiry
                     </button>
@@ -291,16 +311,13 @@ export const BookingEnquiry: React.FC<BookingEnquiryProps> = ({
                 </div>
               </div>
             ) : (
-              /* Light Form Panel in Pure White */
-              <div className="bg-[#FFFFFF] rounded-3xl p-8 sm:p-12 text-[#5A2331] border border-[#EFCACA] shadow-xl">
+              /* White Form Panel */
+              <div className="bg-[#FFFFFF] rounded-3xl p-8 sm:p-12 text-[#2A111E] border border-[#FBCFE8] shadow-xl">
                 
-                <div className="mb-6 pb-6 border-b border-[#FBF0F0] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                <div className="mb-6 pb-6 border-b border-[#FBCFE8] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                   <div>
-                    <span className="font-semibold text-[#5A2331]">Fem’s Glamour Concierge</span>
-                    <span className="text-[#5A2331]/60 block sm:inline sm:ml-2">1st Floor, Princess Building, South Mumbai</span>
-                  </div>
-                  <div className="text-[#873E4F] font-semibold">
-                    Direct Line: {SALON_CONFIG.phoneDisplay}
+                    <span className="font-semibold text-[#2A111E]">Fem’s Glamour Atelier Desk</span>
+                    <span className="text-[#704856]/70 block sm:inline sm:ml-2">Princess Building, South Mumbai</span>
                   </div>
                 </div>
 
@@ -309,11 +326,11 @@ export const BookingEnquiry: React.FC<BookingEnquiryProps> = ({
                   {/* Full Name & Phone Number */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label htmlFor="fullName" className="block text-xs font-semibold text-[#5A2331] uppercase tracking-wider mb-2">
-                        Full Name <span className="text-red-500">*</span>
+                      <label htmlFor="fullName" className="block text-xs font-semibold text-[#2A111E] uppercase tracking-wider mb-2">
+                        Full Name <span className="text-[#E05780]">*</span>
                       </label>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#873E4F]">
+                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#E05780]">
                           <User className="w-4 h-4" />
                         </div>
                         <input
@@ -324,9 +341,9 @@ export const BookingEnquiry: React.FC<BookingEnquiryProps> = ({
                             setFullName(e.target.value);
                             if (errors.fullName) setErrors((prev) => ({ ...prev, fullName: '' }));
                           }}
-                          placeholder="e.g. Sakina Merchant"
-                          className={`w-full pl-10 pr-4 py-3 rounded-2xl bg-[#FDF8F8] border text-sm text-[#5A2331] placeholder-[#5A2331]/40 focus:outline-none focus:ring-2 focus:ring-[#D48E92] transition-all ${
-                            errors.fullName ? 'border-red-400 bg-red-50/30' : 'border-[#EFCACA] focus:border-[#D48E92]'
+                          placeholder="Your full name"
+                          className={`w-full pl-10 pr-4 py-3 bg-[#FFFFFF] rounded-2xl border text-sm text-[#2A111E] placeholder:text-[#704856]/40 transition-colors focus:outline-none ${
+                            errors.fullName ? 'border-red-400 bg-red-50/30' : 'border-[#FBCFE8] focus:border-[#E05780]'
                           }`}
                         />
                       </div>
@@ -336,11 +353,11 @@ export const BookingEnquiry: React.FC<BookingEnquiryProps> = ({
                     </div>
 
                     <div>
-                      <label htmlFor="phoneNumber" className="block text-xs font-semibold text-[#5A2331] uppercase tracking-wider mb-2">
-                        Phone Number <span className="text-red-500">*</span>
+                      <label htmlFor="phoneNumber" className="block text-xs font-semibold text-[#2A111E] uppercase tracking-wider mb-2">
+                        Mobile Phone <span className="text-[#E05780]">*</span>
                       </label>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#873E4F]">
+                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#E05780]">
                           <Phone className="w-4 h-4" />
                         </div>
                         <input
@@ -352,8 +369,8 @@ export const BookingEnquiry: React.FC<BookingEnquiryProps> = ({
                             if (errors.phoneNumber) setErrors((prev) => ({ ...prev, phoneNumber: '' }));
                           }}
                           placeholder="e.g. 09821141422"
-                          className={`w-full pl-10 pr-4 py-3 rounded-2xl bg-[#FDF8F8] border text-sm text-[#5A2331] placeholder-[#5A2331]/40 focus:outline-none focus:ring-2 focus:ring-[#D48E92] transition-all ${
-                            errors.phoneNumber ? 'border-red-400 bg-red-50/30' : 'border-[#EFCACA] focus:border-[#D48E92]'
+                          className={`w-full pl-10 pr-4 py-3 bg-[#FFFFFF] rounded-2xl border text-sm text-[#2A111E] placeholder:text-[#704856]/40 transition-colors focus:outline-none ${
+                            errors.phoneNumber ? 'border-red-400 bg-red-50/30' : 'border-[#FBCFE8] focus:border-[#E05780]'
                           }`}
                         />
                       </div>
@@ -363,41 +380,51 @@ export const BookingEnquiry: React.FC<BookingEnquiryProps> = ({
                     </div>
                   </div>
 
-                  {/* Desired Service Selection */}
+                  {/* Service Selection */}
                   <div>
-                    <label htmlFor="serviceSelect" className="block text-xs font-semibold text-[#5A2331] uppercase tracking-wider mb-2">
-                      Desired Service (Proposed Category) <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#873E4F]">
-                        <Sparkles className="w-4 h-4" />
-                      </div>
-                      <select
-                        id="serviceSelect"
-                        value={selectedService}
-                        onChange={(e) => setSelectedService(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[#FDF8F8] border border-[#EFCACA] text-sm text-[#5A2331] focus:outline-none focus:ring-2 focus:ring-[#D48E92] transition-all appearance-none cursor-pointer"
-                      >
-                        {SALON_CONFIG.services.map((service) => (
-                          <option key={service.id} value={service.name}>
-                            {service.name}
-                          </option>
-                        ))}
-                        <option value="Custom Consultation / Multiple Services">
-                          Custom Consultation / Multiple Services
-                        </option>
-                      </select>
+                    <div className="flex items-center justify-between mb-2">
+                      <label htmlFor="service" className="block text-xs font-semibold text-[#2A111E] uppercase tracking-wider">
+                        Requested Service <span className="text-[#E05780]">*</span>
+                      </label>
+                      {preselectedService && (
+                        <span className="text-[11px] text-[#D6336C] font-semibold bg-[#FFF0F5] px-2.5 py-0.5 rounded-full border border-[#FBCFE8]">
+                          Pre-selected from menu
+                        </span>
+                      )}
                     </div>
+                    <select
+                      id="service"
+                      value={selectedService}
+                      onChange={(e) => {
+                        setSelectedService(e.target.value);
+                        if (errors.selectedService) setErrors((prev) => ({ ...prev, selectedService: '' }));
+                      }}
+                      className={`w-full px-4 py-3 bg-[#FFFFFF] rounded-2xl border text-sm text-[#2A111E] transition-colors focus:outline-none cursor-pointer ${
+                        errors.selectedService ? 'border-red-400' : 'border-[#FBCFE8] focus:border-[#E05780]'
+                      }`}
+                    >
+                      {SALON_CONFIG.services.map((s) => (
+                        <option key={s.id} value={s.name}>
+                          {s.name} ({s.category.toUpperCase()})
+                        </option>
+                      ))}
+                      <option value="Bespoke Bridal & Occasion Consultations">
+                        Bespoke Bridal & Occasion Consultations
+                      </option>
+                      <option value="Custom General Beauty Consultation">
+                        Custom General Beauty Consultation
+                      </option>
+                    </select>
                   </div>
 
                   {/* Preferred Date & Preferred Time */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label htmlFor="preferredDate" className="block text-xs font-semibold text-[#5A2331] uppercase tracking-wider mb-2">
-                        Preferred Date <span className="text-red-500">*</span>
+                      <label htmlFor="preferredDate" className="block text-xs font-semibold text-[#2A111E] uppercase tracking-wider mb-2">
+                        Preferred Date <span className="text-[#E05780]">*</span>
                       </label>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#873E4F]">
+                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#E05780]">
                           <Calendar className="w-4 h-4" />
                         </div>
                         <input
@@ -408,8 +435,8 @@ export const BookingEnquiry: React.FC<BookingEnquiryProps> = ({
                             setPreferredDate(e.target.value);
                             if (errors.preferredDate) setErrors((prev) => ({ ...prev, preferredDate: '' }));
                           }}
-                          className={`w-full pl-10 pr-4 py-3 rounded-2xl bg-[#FDF8F8] border text-sm text-[#5A2331] focus:outline-none focus:ring-2 focus:ring-[#D48E92] transition-all ${
-                            errors.preferredDate ? 'border-red-400' : 'border-[#EFCACA]'
+                          className={`w-full pl-10 pr-4 py-3 bg-[#FFFFFF] rounded-2xl border text-sm text-[#2A111E] transition-colors focus:outline-none ${
+                            errors.preferredDate ? 'border-red-400' : 'border-[#FBCFE8] focus:border-[#E05780]'
                           }`}
                         />
                       </div>
@@ -419,61 +446,47 @@ export const BookingEnquiry: React.FC<BookingEnquiryProps> = ({
                     </div>
 
                     <div>
-                      <label htmlFor="timeSlot" className="block text-xs font-semibold text-[#5A2331] uppercase tracking-wider mb-2">
-                        Preferred Time Window
+                      <label htmlFor="preferredTime" className="block text-xs font-semibold text-[#2A111E] uppercase tracking-wider mb-2">
+                        Preferred Window
                       </label>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#873E4F]">
+                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#E05780]">
                           <Clock className="w-4 h-4" />
                         </div>
                         <select
-                          id="timeSlot"
+                          id="preferredTime"
                           value={preferredTime}
                           onChange={(e) => setPreferredTime(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[#FDF8F8] border border-[#EFCACA] text-sm text-[#5A2331] focus:outline-none focus:ring-2 focus:ring-[#D48E92] transition-all appearance-none cursor-pointer"
+                          className="w-full pl-10 pr-4 py-3 bg-[#FFFFFF] rounded-2xl border border-[#FBCFE8] text-sm text-[#2A111E] focus:outline-none focus:border-[#E05780] transition-colors cursor-pointer"
                         >
                           <option value="Morning (10:00 AM – 01:00 PM)">Morning (10:00 AM – 01:00 PM)</option>
                           <option value="Afternoon (01:00 PM – 04:00 PM)">Afternoon (01:00 PM – 04:00 PM)</option>
-                          <option value="Evening (04:00 PM – 07:30 PM)">Evening (04:00 PM – 07:30 PM)</option>
-                          <option value="Flexible / First Available">Flexible / First Available</option>
+                          <option value="Evening (04:00 PM – 08:00 PM)">Evening (04:00 PM – 08:00 PM)</option>
                         </select>
                       </div>
                     </div>
                   </div>
 
-                  {/* Optional Message */}
+                  {/* Special Requests */}
                   <div>
-                    <label htmlFor="notes" className="block text-xs font-semibold text-[#5A2331] uppercase tracking-wider mb-2">
-                      Optional Message or Styling Request
+                    <label htmlFor="notes" className="block text-xs font-semibold text-[#2A111E] uppercase tracking-wider mb-2">
+                      Personal Notes / Hair Sensitivity (Optional)
                     </label>
-                    <div className="relative">
-                      <div className="absolute top-3.5 left-3.5 pointer-events-none text-[#873E4F]">
-                        <MessageSquare className="w-4 h-4" />
-                      </div>
-                      <textarea
-                        id="notes"
-                        rows={3}
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        placeholder="Share details regarding your occasion, hair length, skin sensitivity, or preferred styling nuances..."
-                        className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[#FDF8F8] border border-[#EFCACA] text-sm text-[#5A2331] placeholder-[#5A2331]/40 focus:outline-none focus:ring-2 focus:ring-[#D48E92] transition-all resize-none"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Clarification Notice */}
-                  <div className="p-4 rounded-2xl bg-[#FBF0F0] border border-[#EFCACA] text-xs text-[#5A2331]/80 flex items-start gap-2.5">
-                    <AlertCircle className="w-4 h-4 text-[#873E4F] shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Please Note:</strong> An appointment request is not a confirmed booking until confirmed directly by the salon team. We will call or message your number to confirm the exact slot.
-                    </span>
+                    <textarea
+                      id="notes"
+                      rows={3}
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="Share your current hair condition, scalp sensitivity, or bridal date..."
+                      className="w-full px-4 py-3 bg-[#FFFFFF] rounded-2xl border border-[#FBCFE8] text-sm text-[#2A111E] placeholder:text-[#704856]/40 focus:outline-none focus:border-[#E05780] transition-colors"
+                    />
                   </div>
 
                   {/* Dual Action Buttons */}
                   <div className="pt-2 flex flex-col sm:flex-row items-center gap-4">
                     <button
                       type="submit"
-                      className="w-full sm:flex-1 py-4 px-6 rounded-full text-xs font-semibold uppercase tracking-[0.16em] text-white bg-[#873E4F] hover:bg-[#5A2331] border border-[#EFCACA] shadow-md hover:shadow-xl transition-all cursor-pointer text-center"
+                      className="w-full sm:flex-1 py-4 px-6 rounded-full text-xs font-semibold uppercase tracking-[0.16em] text-[#FFFFFF] bg-gradient-to-r from-[#E05780] to-[#D6336C] hover:from-[#D6336C] hover:to-[#BE185D] border border-[#FBCFE8]/40 shadow-[0_4px_16px_rgba(224,87,128,0.3)] hover:shadow-[0_8px_24px_rgba(224,87,128,0.45)] transition-all cursor-pointer text-center"
                     >
                       Submit Appointment Request
                     </button>
@@ -481,9 +494,9 @@ export const BookingEnquiry: React.FC<BookingEnquiryProps> = ({
                     <button
                       type="button"
                       onClick={handleWhatsAppDirect}
-                      className="w-full sm:flex-1 py-4 px-6 rounded-full text-xs font-semibold uppercase tracking-[0.16em] text-[#5A2331] bg-[#FBF0F0] hover:bg-[#F6E2E2] border border-[#EFCACA] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                      className="w-full sm:flex-1 py-4 px-6 rounded-full text-xs font-semibold uppercase tracking-[0.16em] text-[#2A111E] bg-[#FFF0F5] hover:bg-[#FFFFFF] border border-[#FBCFE8] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
                     >
-                      <Send className="w-3.5 h-3.5 text-[#873E4F]" />
+                      <Send className="w-3.5 h-3.5 text-[#E05780]" />
                       <span>Enquire via WhatsApp</span>
                     </button>
                   </div>
@@ -491,9 +504,9 @@ export const BookingEnquiry: React.FC<BookingEnquiryProps> = ({
                   <div className="text-center pt-2">
                     <a
                       href={SALON_CONFIG.phoneTel}
-                      className="text-xs text-[#873E4F] hover:text-[#5A2331] font-semibold tracking-wide inline-flex items-center gap-1.5"
+                      className="text-xs text-[#2A111E] hover:text-[#D6336C] font-semibold tracking-wide inline-flex items-center gap-1.5"
                     >
-                      <Phone className="w-3.5 h-3.5 text-[#873E4F]" />
+                      <Phone className="w-3.5 h-3.5 text-[#E05780]" />
                       <span>Prefer speaking directly? Call {SALON_CONFIG.phoneDisplay}</span>
                     </a>
                   </div>
